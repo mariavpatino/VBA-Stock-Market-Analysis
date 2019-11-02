@@ -1,0 +1,130 @@
+Sub StockMarketAnalysis()
+   
+   ' Loop all the sheets
+    For Each Worksheet In ActiveWorkbook.Worksheets
+        Worksheet.Activate
+    
+        'Last non-blank cell Row
+        'The Rows.Count statement returns a count of all the rows in the worksheet. I'm specifying the last cell in column A of the sheet (cell A1048567), and going up until we find the first non-blank cell.
+        LastRow = Worksheet.Cells(Rows.Count, 1).End(xlUp).Row
+
+        'Heading = value asigned
+        Cells(1, "I").Value = "Ticker"
+        Cells(1, "J").Value = "Yearly Change"
+        Cells(1, "K").Value = "Percent Change"
+        Cells(1, "L").Value = "Total Stock Volume"
+        
+        'Variable description
+        Dim Ticker As String
+        Dim OpenPrice As Double
+        Dim ClosePrice As Double
+        Dim YearlyChange As Double
+        Dim PercentChange As Double
+        
+        Dim Volume As Double
+        Volume = 0
+              
+        Dim Column As Integer
+        Column = 1
+        
+        Dim Row As Double
+        Row = 2
+                        
+        'Initial Open Price
+        OpenPrice = Cells(2, Column + 2).Value
+        
+        'Loop through all ticker symbol in Column A
+        Dim x As Long
+        
+        For x = 2 To LastRow
+        
+         'I have to confirm I am working with the same Ticker(Name), but if not... then:
+            If Cells(x + 1, Column).Value <> Cells(x, Column).Value Then
+                'Set Ticker name (just the name -one that represents the list of the ones in column "A"-)
+                Ticker = Cells(x, Column).Value
+                Cells(Row, Column + 8).Value = Ticker
+                'Close Price
+                ClosePrice = Cells(x, Column + 5).Value
+                'Yearly Change
+                YearlyChange = ClosePrice - OpenPrice
+                Cells(Row, Column + 9).Value = YearlyChange
+		
+		worksheet.Cells(Row, Column + 9).NumberFormat = "$0.00"
+
+                'Percent Change (If there is not change):
+                If (OpenPrice = 0 And ClosePrice = 0) Then
+                    PercentChange = 0
+                'If there is change:
+                ElseIf (OpenPrice = 0 And ClosePrice <> 0) Then
+                    PercentChange = 1
+                Else
+                    PercentChange = YearlyChange / OpenPrice
+                    Cells(Row, Column + 10).Value = PercentChange                                                                       
+                End If
+                
+                'Total Volume
+                Volume = Volume + Cells(x, Column + 6).Value
+                Cells(Row, Column + 11).Value = Volume
+                'Add one more row, so it can go through all the rows until the LastRow
+                Row = Row + 1
+                'Reset OpenPrice
+                OpenPrice = Cells(x + 1, Column + 2)
+                'Reset Total Volume
+                Volume = 0
+                
+            'If cells are the same ticker (Have the same name)
+            Else
+                Volume = Volume + Cells(x, Column + 6).Value
+            'If teh ticker does not have the same name anymore, go to the next row to look for a new name, until there are not more names.
+            End If
+        Next x
+        
+        'LastRow for YearlyChange in each WorkSheet
+        YearlyChangeLastRow = Worksheet.Cells(Rows.Count, Column + 8).End(xlUp).Row
+        
+        'Set colors for cells (homework)
+        For y = 2 To YearlyChangeLastRow
+        
+            If (Cells(y, Column + 9).Value > 0 Or Cells(y, Column + 9).Value = 0) Then
+                Cells(y, Column + 9).Interior.ColorIndex = 4
+            ElseIf Cells(y, Column + 9).Value < 0 Then
+                Cells(y, Column + 9).Interior.ColorIndex = 3
+            End If
+        Next y
+        
+        'Set Greatest % Increase
+        Cells(2, Column + 14).Value = "Greatest % Increase"
+        'Set Greatest % Decrease
+        Cells(3, Column + 14).Value = "Greatest % Decrease"
+        'Set Greatest Total Volume
+        Cells(4, Column + 14).Value = "Greatest Total Volume"
+        'Set Ticker
+        Cells(1, Column + 15).Value = "Ticker"
+        'Set Value
+        Cells(1, Column + 16).Value = "Value"
+        
+        'Go through all rows to find the greatest value and the ticker
+        For Z = 2 To YearlyChangeLastRow
+            If Cells(Z, Column + 10).Value = Application.WorksheetFunction.Max(Worksheet.Range("K2:K" & YearlyChangeLastRow)) Then
+                Cells(2, Column + 15).Value = Cells(Z, Column + 8).Value
+                Cells(2, Column + 16).Value = Cells(Z, Column + 10).Value
+               
+            ElseIf Cells(Z, Column + 10).Value = Application.WorksheetFunction.Min(Worksheet.Range("K2:K" & YearlyChangeLastRow)) Then
+                Cells(3, Column + 15).Value = Cells(Z, Column + 8).Value
+                Cells(3, Column + 16).Value = Cells(Z, Column + 10).Value
+                
+            ElseIf Cells(Z, Column + 11).Value = Application.WorksheetFunction.Max(Worksheet.Range("L2:L" & YearlyChangeLastRow)) Then
+                Cells(4, Column + 15).Value = Cells(Z, Column + 8).Value
+                Cells(4, Column + 16).Value = Cells(Z, Column + 11).Value
+            End If
+        Next Z
+        
+    Next Worksheet
+        
+End Sub
+
+
+
+
+
+
