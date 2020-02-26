@@ -18,10 +18,10 @@ Script runs on every worksheet (year: 2014, 2015, 2016), just by running the VBA
 Results: 
 
 ### Year 2014:
-![stock Market](Images/2014.jpg)
+![2014](Images/2014.jpg)
 
 ### Year 2015:
-![stock Market](Images/2015.jpg)
+![2015](Images/2015.jpg)
 
 ### Year 2016:
-![stock Market](Images/2016.jpg)
+![2016](Images/2016.jpg)
